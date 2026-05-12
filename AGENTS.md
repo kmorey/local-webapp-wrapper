@@ -17,6 +17,7 @@ Ask or determine:
 - Which hostnames should open externally?
 - Should the app keep running in the tray after close?
 - Should web notifications focus the app when clicked?
+- Should web notification clicks also be forwarded back to the page, or only focus the window?
 - Should any app register as a MIME/scheme handler, such as `mailto:`?
 - Is the desktop environment Hyprland/Omarchy, GNOME, KDE, or something else?
 
@@ -85,6 +86,7 @@ omarchy restart waybar
       "externalUrlParams": ["url", "u"],
       "notifications": true,
       "patchPageNotifications": true,
+      "forwardNotificationClicks": true,
       "theme": "dark"
     }
   }

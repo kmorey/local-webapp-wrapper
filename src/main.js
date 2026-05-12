@@ -67,6 +67,8 @@ const log = (message) => {
 };
 
 const showWindow = () => {
+  log("showWindow requested");
+
   if (!mainWindow) {
     createWindow();
     return;
@@ -77,7 +79,18 @@ const showWindow = () => {
   }
 
   mainWindow.show();
+  mainWindow.moveTop();
   mainWindow.focus();
+
+  // Some Wayland compositors are conservative about raising windows from
+  // notification callbacks. Briefly toggling always-on-top makes the focus
+  // request visible without leaving the window pinned.
+  mainWindow.setAlwaysOnTop(true);
+  setTimeout(() => {
+    if (mainWindow) {
+      mainWindow.setAlwaysOnTop(false);
+    }
+  }, 250);
 };
 
 const resolveLaunchUrl = (url) => {
@@ -311,7 +324,10 @@ ipcMain.on("web-notification", (event, payload) => {
   notification.on("click", () => {
     log(`notification clicked: ${payload.id}`);
     showWindow();
-    event.sender.send("web-notification-click", payload.id);
+
+    if (config.forwardNotificationClicks !== false) {
+      event.sender.send("web-notification-click", payload.id);
+    }
   });
 
   notification.show();

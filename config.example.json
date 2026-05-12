@@ -23,6 +23,7 @@
       "mimeTypes": ["x-scheme-handler/mailto"],
       "notifications": true,
       "patchPageNotifications": true,
+      "forwardNotificationClicks": false,
       "theme": "dark",
       "backgroundColor": "#111111",
       "window": {
@@ -50,6 +51,7 @@
       "categories": ["Office", "ProjectManagement"],
       "notifications": true,
       "patchPageNotifications": true,
+      "forwardNotificationClicks": true,
       "theme": "dark",
       "backgroundColor": "#111111",
       "window": {

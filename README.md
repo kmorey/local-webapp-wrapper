@@ -87,6 +87,7 @@ Important fields:
 - `mimeTypes`: MIME handlers for desktop registration, such as `x-scheme-handler/mailto`.
 - `mailtoBaseUrl`: URL prefix used to convert `mailto:` links into a webmail compose URL.
 - `patchPageNotifications`: Enables the notification click/focus bridge.
+- `forwardNotificationClicks`: When `true`, notification clicks are forwarded back to the page after focusing the app. Use `false` for sites like Gmail if their click handler navigates to a broken URL.
 
 ## Register Email Handler
 
