@@ -1,0 +1,10 @@
+// Example Waybar module click actions.
+// Keep your existing module definitions and replace only on-click commands.
+
+"custom/basecamp": {
+  "on-click": "uwsm-app -- /home/$USER/.local/bin/local-webapp-wrapper basecamp"
+}
+
+"custom/gmail": {
+  "on-click": "uwsm-app -- /home/$USER/.local/bin/local-webapp-wrapper gmail"
+}

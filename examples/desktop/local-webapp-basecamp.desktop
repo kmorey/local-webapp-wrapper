@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Basecamp
+Comment=Basecamp with external links routed to the default browser
+Exec=/home/YOUR_USER/.local/bin/local-webapp-wrapper basecamp
+Terminal=false
+Type=Application
+Icon=basecamp
+StartupNotify=true
+StartupWMClass=local-webapp-basecamp
+Categories=Office;ProjectManagement;

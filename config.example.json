@@ -1,0 +1,61 @@
+{
+  "apps": {
+    "gmail": {
+      "title": "Email",
+      "desktopName": "local-webapp-email.desktop",
+      "windowClass": "local-webapp-email",
+      "startUrl": "https://mail.google.com/mail/u/0/",
+      "mailtoBaseUrl": "https://mail.google.com/mail/?extsrc=mailto&url=",
+      "internalHosts": [
+        "accounts.google.com",
+        "gmail.com",
+        "mail.google.com",
+        "ogs.google.com",
+        "workspace.google.com"
+      ],
+      "internalHostSuffixes": [
+        ".gstatic.com",
+        ".googleusercontent.com"
+      ],
+      "externalUrlParams": ["q", "url", "u"],
+      "icon": "mail-message-new",
+      "categories": ["Network", "Email"],
+      "mimeTypes": ["x-scheme-handler/mailto"],
+      "notifications": true,
+      "patchPageNotifications": true,
+      "theme": "dark",
+      "backgroundColor": "#111111",
+      "window": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    "basecamp": {
+      "title": "Basecamp",
+      "desktopName": "local-webapp-basecamp.desktop",
+      "windowClass": "local-webapp-basecamp",
+      "startUrl": "https://3.basecamp.com/YOUR_ACCOUNT_ID",
+      "internalHosts": [
+        "3.basecamp.com",
+        "accounts.37signals.com",
+        "launchpad.37signals.com",
+        "basecamp.com"
+      ],
+      "internalHostSuffixes": [
+        ".basecamp.com",
+        ".37signals.com"
+      ],
+      "externalUrlParams": ["url", "u"],
+      "icon": "basecamp",
+      "categories": ["Office", "ProjectManagement"],
+      "notifications": true,
+      "patchPageNotifications": true,
+      "theme": "dark",
+      "backgroundColor": "#111111",
+      "window": {
+        "width": 1280,
+        "height": 900
+      }
+    }
+  }
+}

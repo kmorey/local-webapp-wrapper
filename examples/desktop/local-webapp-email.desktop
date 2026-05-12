@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Name=Email
+Comment=Gmail with external links routed to the default browser
+Exec=/home/YOUR_USER/.local/bin/local-webapp-wrapper gmail %u
+Terminal=false
+Type=Application
+Icon=mail-message-new
+StartupNotify=true
+StartupWMClass=local-webapp-email
+Categories=Network;Email;
+MimeType=x-scheme-handler/mailto;
