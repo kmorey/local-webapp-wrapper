@@ -1,12 +1,13 @@
-const { app, BrowserWindow, Menu, Tray, Notification, ipcMain, nativeImage, nativeTheme, net, session } = require("electron");
+const { app, BrowserWindow, Menu, Tray, Notification, ipcMain, nativeImage, nativeTheme, net, session, clipboard } = require("electron");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 
 const appRoot = path.resolve(__dirname, "..");
-const appId = process.argv[2];
-const launchUrl = process.argv[3];
+const appArgOffset = app.isPackaged ? 1 : 2;
+const appId = process.argv[appArgOffset];
+const launchUrl = process.argv[appArgOffset + 1];
 
 const configPaths = [
   process.env.LOCAL_WEBAPP_CONFIG,
@@ -230,6 +231,52 @@ const classifyUrl = (url) => {
     : { action: "external", url };
 };
 
+const copyText = (text) => {
+  if (!text) {
+    return;
+  }
+
+  clipboard.writeText(text);
+  clipboard.writeText(text, "selection");
+};
+
+const buildContextMenu = (contents, params) => {
+  const template = [];
+
+  if (params.selectionText && !params.isEditable) {
+    template.push({
+      label: "Copy",
+      accelerator: "CmdOrCtrl+C",
+      click: () => copyText(params.selectionText)
+    });
+  }
+
+  if (params.isEditable) {
+    if (template.length > 0) {
+      template.push({ type: "separator" });
+    }
+
+    template.push(
+      { label: "Cut", accelerator: "CmdOrCtrl+X", role: "cut" },
+      {
+        label: "Copy",
+        accelerator: "CmdOrCtrl+C",
+        enabled: params.editFlags.canCopy,
+        click: () => copyText(params.selectionText)
+      },
+      { label: "Paste", accelerator: "CmdOrCtrl+V", role: "paste", enabled: params.editFlags.canPaste }
+    );
+  }
+
+  if (template.length > 0) {
+    template.push({ type: "separator" });
+  }
+
+  template.push({ label: "Select All", accelerator: "CmdOrCtrl+A", click: () => contents.selectAll() });
+
+  return Menu.buildFromTemplate(template);
+};
+
 const createWindow = async () => {
   Menu.setApplicationMenu(null);
 
@@ -258,6 +305,10 @@ const createWindow = async () => {
 
   mainWindow.on("closed", () => {
     mainWindow = null;
+  });
+
+  mainWindow.webContents.on("context-menu", (_event, params) => {
+    buildContextMenu(mainWindow.webContents, params).popup({ window: mainWindow });
   });
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
@@ -335,6 +386,12 @@ ipcMain.on("web-notification", (event, payload) => {
 
 ipcMain.on("preload-ready", () => {
   log("preload ready: Notification override installed");
+});
+
+ipcMain.on("selection-text", (_event, text) => {
+  if (typeof text === "string") {
+    clipboard.writeText(text, "selection");
+  }
 });
 
 app.whenReady().then(() => {

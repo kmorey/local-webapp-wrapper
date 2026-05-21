@@ -8,7 +8,9 @@
     "local-webapp-wrapper": "bin/local-webapp-wrapper"
   },
   "scripts": {
-    "check": "node --check src/main.js && node --check src/preload.js && node --check scripts/install-desktop.js",
+    "check": "node --check src/main.js && node --check src/preload.js && node --check scripts/install-desktop.js && bash -n scripts/package-linux.sh scripts/install-package.sh scripts/install-packaged-app.sh",
+    "package:linux": "bash scripts/package-linux.sh",
+    "install-package": "bash scripts/install-package.sh",
     "install-user": "bash scripts/install-user.sh",
     "start": "electron ."
   },

@@ -28,6 +28,39 @@ Chromium `--app=` windows are clean, but external links usually stay inside Chro
 
 ## Quick Start
 
+### Packaged Install
+
+Build a portable package:
+
+```bash
+git clone <repo-url> ~/Source/local-webapp-wrapper
+cd ~/Source/local-webapp-wrapper
+npm run package:linux
+```
+
+Install the package:
+
+```bash
+tar -xzf dist/local-webapp-wrapper-1.0.0-linux-x86_64.tar.gz
+./local-webapp-wrapper/install.sh
+```
+
+This installs the app under:
+
+```text
+~/.local/opt/local-webapp-wrapper
+```
+
+After installation, the source checkout is no longer needed on that machine.
+
+If `~/.local/bin/local-webapp-wrapper` is managed by stow, install with:
+
+```bash
+LOCAL_WEBAPP_SKIP_BIN_LINK=1 ./local-webapp-wrapper/install.sh
+```
+
+### Source Install
+
 ```bash
 git clone <repo-url> ~/Source/local-webapp-wrapper
 cd ~/Source/local-webapp-wrapper

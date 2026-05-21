@@ -16,7 +16,7 @@ const applicationsDir = path.join(
   process.env.XDG_DATA_HOME || path.join(os.homedir(), ".local", "share"),
   "applications"
 );
-const launcher = path.join(os.homedir(), ".local", "bin", "local-webapp-wrapper");
+const launcher = process.env.LOCAL_WEBAPP_LAUNCHER || path.join(os.homedir(), ".local", "bin", "local-webapp-wrapper");
 
 function desktopEscape(value) {
   return String(value).replaceAll("\\", "\\\\").replaceAll("\n", "\\n");

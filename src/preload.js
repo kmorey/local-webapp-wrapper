@@ -1,4 +1,4 @@
-const { ipcRenderer } = require("electron");
+const { ipcRenderer, contextBridge } = require("electron");
 
 ipcRenderer.send("preload-ready");
 
@@ -73,4 +73,49 @@ ipcRenderer.on("web-notification-click", (_event, id) => {
 Object.defineProperty(window, "Notification", {
   configurable: true,
   value: LocalNotification
+});
+
+if (contextBridge) {
+  try {
+    contextBridge.exposeInMainWorld("localWebappSelection", {
+      setText: (text) => ipcRenderer.send("selection-text", text)
+    });
+  } catch (e) {
+    window.localWebappSelection = {
+      setText: (text) => ipcRenderer.send("selection-text", text)
+    };
+  }
+} else {
+  window.localWebappSelection = {
+    setText: (text) => ipcRenderer.send("selection-text", text)
+  };
+}
+
+let lastSelection = "";
+let selectionTimer;
+
+const publishSelection = () => {
+  clearTimeout(selectionTimer);
+
+  selectionTimer = setTimeout(() => {
+    const selection = window.getSelection();
+    const text = selection ? selection.toString() : "";
+
+    if (text && text !== lastSelection) {
+      lastSelection = text;
+      if (window.localWebappSelection) {
+        window.localWebappSelection.setText(text);
+      } else {
+        ipcRenderer.send("selection-text", text);
+      }
+    } else if (!text) {
+      lastSelection = "";
+    }
+  }, 50);
+};
+
+window.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("selectionchange", publishSelection, true);
+  document.addEventListener("mouseup", publishSelection, true);
+  document.addEventListener("keyup", publishSelection, true);
 });
