@@ -54,6 +54,7 @@ const gotLock = app.requestSingleInstanceLock();
 
 if (!gotLock) {
   app.quit();
+  process.exit(0);
 }
 
 let mainWindow = null;
@@ -103,6 +104,11 @@ const resolveLaunchUrl = (url) => {
 };
 
 const handleLaunchUrl = (url) => {
+  if (!url) {
+    showWindow();
+    return;
+  }
+
   const targetUrl = resolveLaunchUrl(url);
 
   if (mainWindow && targetUrl) {
@@ -241,7 +247,21 @@ const copyText = (text) => {
 };
 
 const buildContextMenu = (contents, params) => {
-  const template = [];
+  const template = [
+    {
+      label: "Back",
+      accelerator: "Alt+Left",
+      enabled: contents.canGoBack(),
+      click: () => contents.goBack()
+    },
+    {
+      label: "Forward",
+      accelerator: "Alt+Right",
+      enabled: contents.canGoForward(),
+      click: () => contents.goForward()
+    },
+    { type: "separator" }
+  ];
 
   if (params.selectionText && !params.isEditable) {
     template.push({
@@ -311,6 +331,20 @@ const createWindow = async () => {
     buildContextMenu(mainWindow.webContents, params).popup({ window: mainWindow });
   });
 
+  mainWindow.webContents.on("before-input-event", (event, input) => {
+    if (!input.alt || input.control || input.meta || input.shift || input.type !== "keyDown") {
+      return;
+    }
+
+    if (input.key === "ArrowLeft" && mainWindow.webContents.canGoBack()) {
+      event.preventDefault();
+      mainWindow.webContents.goBack();
+    } else if (input.key === "ArrowRight" && mainWindow.webContents.canGoForward()) {
+      event.preventDefault();
+      mainWindow.webContents.goForward();
+    }
+  });
+
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     const result = classifyUrl(url);
 
@@ -339,6 +373,10 @@ const createWindow = async () => {
     }
   });
 
+  if (config.userAgent) {
+    mainWindow.webContents.setUserAgent(config.userAgent);
+  }
+
   mainWindow.webContents.on("did-fail-load", (_event, errorCode, errorDescription, validatedUrl, isMainFrame) => {
     if (isMainFrame && errorCode !== -3) {
       console.error(`Failed to load ${validatedUrl}: ${errorDescription} (${errorCode})`);
@@ -355,7 +393,8 @@ const createWindow = async () => {
 };
 
 app.on("second-instance", (_event, argv) => {
-  handleLaunchUrl(argv[3]);
+  const urlArg = argv.find((arg) => /^https?:/.test(arg));
+  handleLaunchUrl(urlArg);
 });
 
 ipcMain.on("web-notification", (event, payload) => {
@@ -402,6 +441,21 @@ app.whenReady().then(() => {
   session.defaultSession.setPermissionCheckHandler((_webContents, permission) => {
     return permission === "notifications" && config.notifications !== false;
   });
+
+  if (config.userAgent) {
+    session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
+      const parsed = parseUrl(details.url);
+
+      if (parsed && hostMatches(parsed.hostname)) {
+        details.requestHeaders["User-Agent"] = config.userAgent;
+        details.requestHeaders["Sec-CH-UA"] = '"Chromium";v="142", "Google Chrome";v="142", "Not_A Brand";v="99"';
+        details.requestHeaders["Sec-CH-UA-Mobile"] = "?0";
+        details.requestHeaders["Sec-CH-UA-Platform"] = '"Linux"';
+      }
+
+      callback({ requestHeaders: details.requestHeaders });
+    });
+  }
 
   createTray();
   createWindow();
